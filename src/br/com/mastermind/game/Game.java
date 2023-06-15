@@ -79,13 +79,6 @@ public class Game {
   }
 
   private void handleAttempt(String attempt) {
-    // if (currentAttempt >= 10) {
-    //   LOGGER.info("Limite de tentativas atingido!");
-    //   LOGGER.info("A senha era: ");
-    //   LOGGER.info(String.format("%d%d%d%d", password[0], password[1], password[2], password[3]));
-    //   return;
-    // }
-
     if (attempt.length() != 4) {
       LOGGER.warning("A senha deve ter 4 dígitos!");
       return;
