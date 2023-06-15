@@ -1,7 +1,5 @@
 package br.com.mastermind.game;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.LogRecord;
@@ -10,18 +8,26 @@ import java.util.logging.SimpleFormatter;
 
 public class Game {
   private static final Logger LOGGER = Logger.getLogger(Logger.class.getName());
-  private final int[] password = generatePassword();
-  private final int[][] attempts = new int[10][4];
-  private int currentAttempt = 0;
+  private final int[] password;
+  private final int[][] attempts;
+  private int currentAttempt;
+  private boolean devmode;
+
+  public Game(boolean devmode) {
+    this.devmode = devmode;
+    this.currentAttempt = 0;
+    this.password = generatePassword();
+    this.attempts = new int[10][4];
+  }
 
   public void start() {
-    LOGGER.setUseParentHandlers(false); // Desativa o uso dos handlers padrão
+    LOGGER.setUseParentHandlers(false);
 
     ConsoleHandler handler = new ConsoleHandler();
     handler.setFormatter(new SimpleFormatter() {
       @Override
       public synchronized String format(LogRecord record) {
-        return record.getMessage() + System.lineSeparator(); // Inclui uma quebra de linha ao final da mensagem
+        return record.getMessage() + System.lineSeparator();
       }
     });
 
@@ -34,7 +40,13 @@ public class Game {
     LOGGER.info("Boa sorte!");
     LOGGER.info(" ");
 
-    while (currentAttempt <= 10) {
+    if (devmode) {
+      LOGGER.info(String.format("A senha é: %d%d%d%d", password[0], password[1], password[2], password[3]));
+    }
+
+    Scanner scanner = new Scanner(System.in);
+
+    while (currentAttempt < 10) {
       LOGGER.info(String.format("Digite sua tentativa %d: ", currentAttempt + 1));
 
       if (currentAttempt > 0) {
@@ -45,12 +57,15 @@ public class Game {
         LOGGER.info(" ");
       }
 
-      Scanner scanner = new Scanner(System.in);
       String attempt = scanner.nextLine();
 
       this.handleAttempt(attempt);
       LOGGER.info(" ");
     }
+
+    LOGGER.info("Você perdeu, ruim demais kkkkkjkkj");
+
+    scanner.close();
   }
 
   private int[] generatePassword() {
@@ -64,12 +79,12 @@ public class Game {
   }
 
   private void handleAttempt(String attempt) {
-    if (currentAttempt >= 10) {
-      LOGGER.info("Limite de tentativas atingido!");
-      LOGGER.info("A senha era: ");
-      LOGGER.info(String.format("%d%d%d%d", password[0], password[1], password[2], password[3]));
-      return;
-    }
+    // if (currentAttempt >= 10) {
+    //   LOGGER.info("Limite de tentativas atingido!");
+    //   LOGGER.info("A senha era: ");
+    //   LOGGER.info(String.format("%d%d%d%d", password[0], password[1], password[2], password[3]));
+    //   return;
+    // }
 
     if (attempt.length() != 4) {
       LOGGER.warning("A senha deve ter 4 dígitos!");
@@ -107,7 +122,7 @@ public class Game {
 
     if (digitosCorretos == 4) {
       LOGGER.info("Você acertou a senha!");
-      return;
+      this.end();
     } else {
       LOGGER.info(String.format("Digitos corretos: %d", digitosCorretos));
       LOGGER.info(String.format("Digitos deslocados: %d", digitosDeslocados));
@@ -121,5 +136,9 @@ public class Game {
       }
     }
     return false;
+  }
+
+  private void end() {
+    System.exit(0);
   }
 }
